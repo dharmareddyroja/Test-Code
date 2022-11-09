@@ -1,0 +1,12 @@
+// 3. Make a basic http callout and print the result using system.debug
+
+https://postman-echo.com/get?foo1=bar1&foo2=bar2 //
+
+ HttpRequest reqst = new HttpRequest();
+ HttpResponse respns = new HttpResponse();
+ Http http = new Http();
+ reqst.setEndpoint('https://postman-echo.com/get?foo1=bar1&foo2=bar2');
+ reqst.setMethod('GET');
+ respns = http.send(reqst);
+ string outputresult = respns.getBody();
+ System.debug(outputresult);

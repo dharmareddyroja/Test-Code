@@ -1,0 +1,78 @@
+// 2. Build a basic lightning component that can query a list of 10 most recently created accounts and display it using a lightning app//
+
+
+Controller:
+
+public class AccountController
+ {
+    @AuraEnabled
+    public static List<Account> getAccountRecord()
+   {
+        return new List<Account>([Select id,Name,createddate from Account order by createddate DESC limit 10]);
+    }
+}
+
+
+Component:
+
+<aura:component controller="AccountAuraClr" implements="force:appHostable,forceCommunity:availableForAllPageTypes,
+flexipage:availableForAllPageTypes" access="global">
+ <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    <aura:attribute name="accLst" type="Account[]"/> 
+      <div class="slds-card__body">
+        <table class="slds-table slds-table_bordered slds-no-row-hover slds-table_cell-buffer">
+          <thead>
+            <tr class="slds-text-title_caps">
+              <th scope="col">
+                <div class="slds-truncate" title="Name">Name</div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" title="Creadted Date">Creadted Date</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+              <aura:iteration items="{!v.accLst}" var="acc"> 
+                  <tr class="slds-hint-parent">
+                      <td>
+                          <div class="slds-truncate">{!acc.Name}</div>
+                      </td>
+                      <td>
+                          <div class="slds-truncate" >{!acc.CreatedDate}</div>
+                      </td>
+                  </tr>                     
+              </aura:iteration>
+          </tbody>
+        </table>
+      </div>
+</aura:component>
+
+
+
+Controller.js:
+
+({
+                doInit : function(component, event, helper) 
+		{
+                                helper.getAccontRecord(component); 
+                }
+})
+
+
+Helper.js:
+({
+ getAccontRecord : function( component ) 
+ {
+    var action = component.get("c.getAccountRecord"); 
+        action.setCallback(this, function(response)
+ 	{
+            var state = response.getState(); 
+            var result = JSON.stringify(response.getReturnValue());
+            if (component.isValid() && state == "SUCCESS")
+	    {
+              component.set("v.accList", response.getReturnValue());  
+            }
+	}
+        $A.enqueueAction(action);
+ }
+})
